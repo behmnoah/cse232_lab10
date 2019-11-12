@@ -1,0 +1,81 @@
+#include<fstream>
+#include<iostream>
+#include<vector>
+#include<algorithm>
+#include<map>
+#include<string>
+
+using std::vector;
+using std::string;
+using std::cin;
+using std::cout;
+using std::endl;
+using std::map;
+
+
+int main() {
+    string password = "";
+    cout << "Give me a password: ";
+    cin >> password;
+    cout << "You provided a password of " << password << endl;
+    cout << "The most similar passwords to " << password << " are:" << endl;
+    vector<string> empty_vec;
+    vector<string> all_passwords;
+    vector<string> lowest_diff_words;
+    std::ifstream input("common_passwords.txt");
+    // myfile.open("common_passwords.txt");
+    string holder = "";
+    int lowest_difference = 1000;
+    while (input >> holder) {
+        all_passwords.push_back(holder);
+    }
+
+    int length_difference = 0;
+    int total_difference = 0;
+    for(int x = 0; x < static_cast<int>(all_passwords.size()); x++){
+        if(password.length() < all_passwords[x].length()){
+            //cout << "a" << endl;
+            length_difference = all_passwords[x].length() - password.length();
+            for(int i = 0; i < static_cast<int>(password.length()); i++){
+                if(password[i] != all_passwords[x].at(i)){
+                    total_difference++; 
+                }
+            }
+        total_difference += length_difference;
+        } else if(password.length() > all_passwords[x].length()) {
+            //cout << "b" << endl;
+            length_difference = password.length() - all_passwords[x].length();
+            for(int i = 0; i < static_cast<int>(all_passwords[x].length()); i++){
+                if(password[i] != all_passwords[x].at(i)){
+                    total_difference++; 
+                }
+            }
+        total_difference += length_difference;
+        } else {
+            //cout << "c" << endl;
+            length_difference = 0;
+            for(int i = 0; i < static_cast<int>(password.length()); i++){
+                if(password[i] != all_passwords[x].at(i)){
+                    total_difference++; 
+                }
+            }
+        total_difference += length_difference;
+        }
+        
+        if(total_difference < lowest_difference) {
+            lowest_difference = total_difference;
+            lowest_diff_words = empty_vec;
+            lowest_diff_words.push_back(all_passwords[x]);
+        } else if(total_difference == lowest_difference) {
+            lowest_diff_words.push_back(all_passwords[x]);
+        }
+        total_difference = 0;
+    }
+    std::sort(lowest_diff_words.begin(), lowest_diff_words.end());
+
+    for(int i = 0; i < static_cast<int>(lowest_diff_words.size()); i++){
+            cout << lowest_diff_words[i] << ", ";
+    }
+    cout << endl;
+    cout << "All of which are " << lowest_difference << " character(s) different." << endl;
+}
